@@ -1,0 +1,42 @@
+﻿@using cia_server.Shared.CIA;
+@inject NavigationManager NavigationManager
+<div class="col-lg-6 d-inline-block align-self-stretch mb-4">
+    <div class="card text-center" style="height:100%;position:relative;">
+        <div class="card-header">
+            <strong>@(DisplayTitle)</strong>
+        </div>
+        <div class="card-text mt-3 mb-2">
+            <div>
+                <CiaIcon CIA="CIA"></CiaIcon>
+            </div>
+            <span class="card-text">
+                
+                @if (CIA.Titles != null)
+                {
+                    <div>@CIA.Titles?.English.LongDescription</div>
+                    <div>@CIA.Titles?.English.Publisher</div>
+                }
+                <div>@CIA.TitleID</div>
+                <div>@CIA.Type.ToString().Split(".").Last()</div>
+            </span>
+        </div>
+        <a href="@CiaUrl" @onclick="ShowModal" @onclick:preventDefault style="position:absolute;top:0;right:0;bottom:0;left:0;">&nbsp;</a>
+        <CiaModal CIA="CIA" @ref="modal" CiaUrl="@CiaUrl"></CiaModal>
+    </div>
+</div>
+
+@code {
+    [Parameter()]
+    public CiaFile CIA { get; set; }
+
+    public CiaModal modal { get; set; }
+
+    public string DisplayTitle => CIA.Titles?.English.ShortDescription ?? Path.GetFileName(CIA.Path);
+
+    private string CiaUrl => HelperFunctions.GetUrl(CIA.Path, NavigationManager.Uri);
+
+    private async Task ShowModal()
+    {
+        await modal.ShowModal();
+    }
+}

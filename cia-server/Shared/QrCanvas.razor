@@ -1,0 +1,99 @@
+﻿@using System.Drawing;
+@inject IJSRuntime JS
+
+<canvas @attributes="AdditionalAttributes" id="@id"></canvas>
+
+@code {
+    public enum QrLevels { L, M, Q, H }
+
+    [Parameter()]
+    public string id { get; set; } = Guid.NewGuid().ToString("N");
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
+
+    private string _Data = "";
+
+    [Parameter()]
+    public string Data
+    {
+        get => _Data;
+        set
+        {
+            _Data = value;
+            if (HasRendered)
+            {
+                RenderQr();
+            }
+        }
+    }
+
+    private int _PixelsPerModule = 20;
+
+    [Parameter()]
+    public int PixelsPerModule
+    {
+        get => _PixelsPerModule;
+        set
+        {
+            _PixelsPerModule = value;
+            if (HasRendered)
+            {
+                RenderQr();
+            }
+        }
+    }
+
+    private int _Padding = 4;
+
+    [Parameter()]
+    public int Padding
+    {
+        get => _Padding;
+        set
+        {
+            _Padding = value;
+            if (HasRendered)
+            {
+                RenderQr();
+            }
+        }
+    }
+
+    private QrLevels _Level = QrLevels.L;
+
+    [Parameter()]
+    public QrLevels Level
+    {
+        get => _Level;
+        set
+        {
+            _Level = value;
+            if (HasRendered)
+            {
+                RenderQr();
+            }
+        }
+    }
+
+    [Parameter()]
+    public Color BackgroundColor { get; set; } = Color.White;
+
+    [Parameter()]
+    public Color ForegroundColor { get; set; } = Color.Black;
+
+
+    private bool HasRendered = false;
+
+    private async Task RenderQr()
+    {
+        await JS.InvokeVoidAsync("QrToCanvas", _Data, _Level.ToString().Split(".").Last(), _PixelsPerModule, _Padding, $"rgba({BackgroundColor.R},{BackgroundColor.G},{BackgroundColor.B},{(decimal)BackgroundColor.A / (decimal)255})", $"rgba({ForegroundColor.R},{ForegroundColor.G},{ForegroundColor.B},{(decimal)ForegroundColor.A / (decimal)255})", id);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        await RenderQr();
+        HasRendered = true;
+    }
+}

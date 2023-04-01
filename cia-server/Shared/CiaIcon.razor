@@ -1,0 +1,52 @@
+﻿@using Blazor.Extensions;
+@using Blazor.Extensions.Canvas.Canvas2D;
+@using cia_server.Shared.CIA;
+@inject IJSRuntime JS
+<canvas id="@ID" width="48" height="48" style="width: 96px" />
+@code {
+    [Parameter()]
+    public CiaFile CIA { get; set; }
+
+    public string ID = Guid.NewGuid().ToString("N");
+    //private Canvas2DContext _context;
+    //protected BECanvasComponent _canvas { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //_context = await this._canvas.CreateCanvas2DAsync();
+        if (CIA.LargeIcon != null)
+        {
+            await JS.InvokeVoidAsync("DrawIconToCanvas", CIA.LargeIcon, ID, 48);
+            /*
+            int[] TILE_ORDER = { 0, 1, 8, 9, 2, 3, 10, 11, 16, 17, 24, 25, 18, 19, 26, 27, 4, 5, 12, 13, 6, 7, 14, 15, 20, 21, 28, 29, 22, 23, 30, 31, 32, 33, 40, 41, 34, 35, 42, 43, 48, 49, 56, 57, 50, 51, 58, 59, 36, 37, 44, 45, 38, 39, 46, 47, 52, 53, 60, 61, 54, 55, 62, 63 };
+
+            int iconSize, i = 0;
+            byte[] iconData;
+            Microsoft.Maui.Graphics.ICanvas canvasCtx = new Microsoft.Maui.Graphics.canv;
+
+            iconSize = 48;
+            iconData = CIA.LargeIcon;
+
+
+            for (int tile_y = 0; tile_y < iconSize; tile_y += 8)
+            {
+                for (int tile_x = 0; tile_x < iconSize; tile_x += 8)
+                {
+                    for (int k = 0; k < 8 * 8; k++)
+                    {
+                        int x = TILE_ORDER[k] & 0x7;
+                        int y = TILE_ORDER[k] >> 3;
+                        byte color = iconData[i];
+                        i++;
+                        byte b = (byte)((color & 0x1f) << 3);
+                        byte g = (byte)(((color >> 5) & 0x3f) << 2);
+                        byte r = (byte)(((color >> 11) & 0x1f) << 3);
+                        canvasCtx.FillStyle = new Maui.Graphics.SolidColorBrush(new Maui.Graphics.Color(r, g, b));
+                        canvasCtx.FillRect(x + tile_x, y + tile_y, 1, 1);
+                    }
+                }
+            }
+            */
+        }
+    }
+}

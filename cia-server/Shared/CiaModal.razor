@@ -1,0 +1,81 @@
+﻿@using cia_server.Shared.CIA;
+@inject IJSRuntime JS
+
+<div style="@ModalDisplayStyle position: fixed;top:0;right:0;bottom:0;left:0;transition: 200ms all; height: 100%; width: 100%; z-index:10000; background-color: rgba(0,0,0,0.5)">
+    <div class="bs-component modal @ModalClass" style="@ModalDisplayStyle">
+        <div class="modal-dialog" style="width: 800px; max-width: calc(100% - 64px);margin: 28px auto" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@CIA.DisplayTitle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="HideModal" @onclick:preventDefault>
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <QrCanvas style="width: 100%; max-height: calc(100vh - 231px); max-width: calc(100vh - 231px)" Data="@CiaUrl" Padding="2"></QrCanvas>
+                </div>
+                <div class="modal-footer d-block">
+                    <div class="d-inline-block float-start">
+                        <InputText class="form-control d-inline-block w-auto inline-vertical-mid" placeholder="ip or hostname" @bind-Value="IP"></InputText>
+                        <button type="button" class="btn btn-primary" @onclick="SendToFbi" @onclick:preventDefault>Send to FBI</button>
+                    </div>
+                    <button type="button" class="btn btn-secondary float-end inline-vertical-mid" data-bs-dismiss="modal" @onclick="HideModal" @onclick:preventDefault>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter()]
+    public string CiaUrl { get; set; }
+    private string ModalDisplayStyle => ShouldShow ? "display: block;" : "display: none;";
+    private bool ShouldShow { get; set; } = false;
+
+    private string ModalClass => FadeIn ? "fade show" : "fade opacity-0";
+    private bool FadeIn { get; set; } = false;
+
+    public bool ModalIsShowing { get; private set; } = false;
+
+    public string IP { 
+        get; 
+        set; 
+    } = "";
+
+    [Parameter()]
+    public CiaFile CIA { get; set; }
+
+    public async Task ShowModal()
+    {
+        ShouldShow = false;
+        FadeIn = false;
+        await Task.Delay(1);
+        ShouldShow = true;
+        await Task.Delay(200);
+        FadeIn = true;
+        ModalIsShowing = true;
+    }
+
+    public async Task HideModal()
+    {
+        ShouldShow = true;
+        FadeIn = true;
+        await Task.Delay(1);
+        ShouldShow = false;
+        await Task.Delay(200);
+        FadeIn = false;
+        ModalIsShowing = false;
+    }
+
+    public async Task ToggleModal()
+    {
+        ShouldShow = !ShouldShow;
+        await Task.Delay(100);
+
+    }
+
+    private async Task SendToFbi()
+    {
+        JS.InvokeVoidAsync("alert", "Not implemented");
+    }
+}

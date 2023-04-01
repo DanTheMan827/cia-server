@@ -1,0 +1,40 @@
+﻿@page "/"
+@using System.Collections.Specialized;
+@using cia_server.Shared.CIA;
+@implements IDisposable;
+
+<PageTitle>Index</PageTitle>
+<div class="navbar top-row navbar-dark bg-primary px-4 fixed-top d-block text-center">
+    <InputText placeholder="Search..." @bind-Value="Filter" @oninput="@(e => Filter = e.Value.ToString())" class="form-control d-inline-block" style="width: 100%; max-width: 500px;height:40px;"></InputText>
+</div>
+<article class="content px-4" style="max-width: 1600px; margin: 0 auto; padding-top: calc(72px + 1.5rem)">
+    <div class="row">
+        @foreach (var cia in CiaList.Shared.Files.Where(e => e.DisplayTitle.ToLower().Contains(Filter.ToLower())).OrderBy(cia => cia.DisplayTitle))
+    {
+        <CiaFragment CIA="cia" />
+    }
+    </div>
+</article>
+@code {
+    public string Filter { get; set; } = "";
+    protected override Task OnInitializedAsync()
+    {
+        CiaList.Shared.Files.CollectionChanged += OnCollectionChanged;
+        return base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        CiaList.Shared.Files.CollectionChanged -= OnCollectionChanged;
+    }
+
+    void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateFilter()
+    {
+        
+    }
+}
